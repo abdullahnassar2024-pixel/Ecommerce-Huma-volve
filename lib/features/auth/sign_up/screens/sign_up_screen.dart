@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../../data/auth_service.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/theme.dart';
@@ -17,7 +17,61 @@ class _SignUpScreenState extends State<SignUpScreen> {
   late final TextEditingController nameController;
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
+  bool isLoading = false;
+  Future<void> handleSignUp() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
 
+    if (isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      await AuthService.signUp(
+        name: nameController.text,
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Account created successfully! Please login.',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString().replaceFirst('Exception: ', ''),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
   @override
   void initState() {
     nameController = TextEditingController();
@@ -110,16 +164,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 40),
                 PrimaryButton(
                   text: 'Sign Up',
-                  onPressed: () async {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                      );
-                    }
-                  },
+                  isLoading: isLoading,
+                  onPressed: handleSignUp,
                 ),
                 const SizedBox(height: 24),
                 Row(
