@@ -3,7 +3,9 @@ import '../../../core/theme.dart';
 import '../../home/screens/home_screen.dart';
 import '../../cart/screens/cart_screen.dart';
 import '../../profile/screens/profile_screen.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../home/cubit/home_cubit.dart';
+import '../../home/data/home_service.dart';
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
 
@@ -15,7 +17,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const HomeScreen(),
+    BlocProvider(
+      create: (context) =>
+      HomeCubit(HomeService())..getHomeData(),
+      child: const HomeScreen(),
+    ),
     const CartScreen(),
     const ProfileScreen(),
   ];
