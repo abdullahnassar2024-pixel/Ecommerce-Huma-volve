@@ -6,6 +6,10 @@ import '../../profile/screens/profile_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../home/data/home_service.dart';
+import '../../home/data/repositories/home_repository_impl.dart';
+import '../../home/domain/usecases/get_home_data_usecase.dart';
+
+
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
 
@@ -19,7 +23,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _screens = [
     BlocProvider(
       create: (context) =>
-      HomeCubit(HomeService())..getHomeData(),
+      HomeCubit(
+        GetHomeDataUseCase(
+          HomeRepositoryImpl(
+            HomeService(),
+          ),
+        ),
+      )..getHomeData(),
       child: const HomeScreen(),
     ),
     const CartScreen(),
@@ -29,7 +39,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
