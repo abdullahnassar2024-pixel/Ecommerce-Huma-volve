@@ -10,8 +10,14 @@ class HomeRepositoryImpl implements HomeRepository {
   HomeRepositoryImpl(this.homeService);
 
   @override
-  Future<List<Product>> getProducts() async {
-    final data = await homeService.getProducts();
+  Future<List<Product>> getProducts({
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    final data = await homeService.getProducts(
+      limit: limit,
+      offset: offset,
+    );
 
     return data.map((json) {
       return ProductModel.fromJson(

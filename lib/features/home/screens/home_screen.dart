@@ -18,6 +18,39 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategoryIndex = 0;
   String _searchQuery = '';
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final state = context.read<HomeCubit>().state;
+
+    if (state is! HomeSuccess ||
+        state.isLoadingMore ||
+        !state.hasMore ||
+        state.loadMoreError != null) {
+      return;
+    }
+
+    if (_scrollController.position.extentAfter < 300) {
+      context.read<HomeCubit>().loadMoreProducts();
+    }
+  }
+
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppTheme.background,
       body: SafeArea(
         child: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
@@ -224,6 +258,55 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
+
+            BlocBuilder<HomeCubit, HomeState>(
+              builder: (context, state) {
+                if (state is! HomeSuccess) {
+                  return const SliverToBoxAdapter(
+                    child: SizedBox.shrink(),
+                  );
+                }
+
+                if (state.isLoadingMore) {
+                  return const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  );
+                }
+
+                if (state.loadMoreError != null) {
+                  return SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Text(
+                            state.loadMoreError!,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<HomeCubit>().loadMoreProducts();
+                            },
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                return const SliverToBoxAdapter(
+                  child: SizedBox.shrink(),
+                );
+              },
+            ),
+
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),

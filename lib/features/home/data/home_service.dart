@@ -23,9 +23,18 @@ class HomeService {
     );
   }
 
-  Future<List<dynamic>> getProducts() async {
+  Future<List<dynamic>> getProducts({
+    int limit = 20,
+    int offset = 0,
+  }) async {
     try {
-      final response = await _dio.get('products');
+      final response = await _dio.get(
+        'products',
+        queryParameters: {
+          'limit': limit,
+          'offset': offset,
+        },
+      );
 
       if (response.data is! List) {
         throw Exception('Invalid products response');
