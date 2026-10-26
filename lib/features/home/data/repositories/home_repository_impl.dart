@@ -36,5 +36,12 @@ class HomeRepositoryImpl implements HomeRepository {
         return (json as Map)['name'].toString();
       }),
     ];
+
+  }
+  @override
+  Future<Product> getProductById(int id) async {
+    final data = await homeService.getProductById(id);
+
+    return ProductModel.fromJson(data);
   }
 }

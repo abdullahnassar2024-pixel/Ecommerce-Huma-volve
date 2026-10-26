@@ -11,7 +11,12 @@ import '../../home/domain/usecases/get_home_data_usecase.dart';
 
 
 class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+  const MainNavigationScreen({
+    super.key,
+    this.onReady,
+  });
+
+  final VoidCallback? onReady;
 
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
@@ -19,6 +24,17 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      debugPrint('Main Navigation Ready');
+      widget.onReady?.call();
+    });
+  }
 
   final List<Widget> _screens = [
     BlocProvider(

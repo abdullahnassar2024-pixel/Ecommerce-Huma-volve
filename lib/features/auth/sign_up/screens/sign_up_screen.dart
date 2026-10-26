@@ -14,8 +14,12 @@ import '../../presentation/cubit/auth_cubit.dart';
 import '../../presentation/cubit/auth_state.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  const SignUpScreen({
+    super.key,
+    this.onLoginSuccess,
+  });
 
+  final VoidCallback? onLoginSuccess;
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
@@ -82,8 +86,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-            );
+              MaterialPageRoute(
+                builder: (_) => LoginScreen(
+                  onLoginSuccess: widget.onLoginSuccess,
+                ),
+              ),            );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -189,7 +196,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   context,
                                   animation,
                                   secondaryAnimation,
-                                ) => const LoginScreen(),
+                                    ) => LoginScreen(
+                                  onLoginSuccess: widget.onLoginSuccess,
+                                ),
                                 transitionsBuilder:
                                     (
                                       context,
