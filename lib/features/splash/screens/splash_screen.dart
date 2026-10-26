@@ -3,7 +3,10 @@ import '../../../core/theme.dart';
 import '../../auth/login/screens/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({
+    super.key,
+    this.onLoginSuccess,
+  });  final VoidCallback? onLoginSuccess;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -22,7 +25,9 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen(),
+          pageBuilder: (context, animation, secondaryAnimation) => LoginScreen(
+            onLoginSuccess: widget.onLoginSuccess,
+          ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },

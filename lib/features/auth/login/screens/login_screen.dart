@@ -13,8 +13,8 @@ import '../../../../core/theme.dart';
 import '../../sign_up/screens/sign_up_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-
+  const LoginScreen({super.key, this.onLoginSuccess});
+  final VoidCallback? onLoginSuccess;
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -23,8 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
-
-
 
   void handleLogin(BuildContext blocContext) {
     if (!(_formKey.currentState?.validate() ?? false)) {
@@ -73,7 +71,14 @@ class _LoginScreenState extends State<LoginScreen> {
             debugPrint('Login successful');
 
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => MainNavigationScreen()),
+              MaterialPageRoute(
+                builder: (_) =>
+                    MainNavigationScreen(onReady: widget.onLoginSuccess),
+              ),
+            );
+
+            debugPrint(
+              'LOGIN CALLBACK EXISTS: ${widget.onLoginSuccess != null}',
             );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -179,11 +184,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.pushReplacement(
                               context,
                               PageRouteBuilder(
-                                pageBuilder: (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                ) => const SignUpScreen(),
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        SignUpScreen(
+                                          onLoginSuccess: widget.onLoginSuccess,
+                                        ),
                                 transitionsBuilder:
                                     (
                                       context,

@@ -22,7 +22,21 @@ class HomeService {
       ),
     );
   }
+  Future<Map<String, dynamic>> getProductById(int id) async {
+    try {
+      final response = await _dio.get('products/$id');
 
+      if (response.data is! Map) {
+        throw Exception('Invalid product response');
+      }
+
+      return Map<String, dynamic>.from(response.data as Map);
+    } on DioException catch (e) {
+      throw Exception(
+        'Failed to load product: ${e.message}',
+      );
+    }
+  }
   Future<List<dynamic>> getProducts({
     int limit = 20,
     int offset = 0,

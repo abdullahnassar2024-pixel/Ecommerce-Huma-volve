@@ -8,4 +8,5 @@ abstract class HomeRepository {
   });
 
   Future<List<String>> getCategories();
+  Future<Product> getProductById(int id);
 }
